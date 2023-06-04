@@ -7,6 +7,8 @@ from utils.generate_samples import generate_samples
 def make_predictions(pids, segment_length):
     samples = generate_samples(pids, segment_length)
     X_train, y_train = divide_X_train_and_y_train(samples)
+    print(X_train)
+    print(y_train)
     model = build_model(X_train, y_train)
     print(model)
 
