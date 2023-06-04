@@ -28,6 +28,6 @@ def find_segment_info(pids, segment_length):
 
 
 if __name__ == '__main__':
-    person_ids = [2, 3]
+    person_ids = [2, 3, 4, 5, 7, 10, 11, 17, 22, 23, 27, 34, 35]
     segment_info = find_segment_info(person_ids, 2)
     print('Average of all segments: ', segment_info[0], ', Minimum size of segment:', segment_info[1], 'Maximum size of segment:', segment_info[2])

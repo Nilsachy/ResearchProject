@@ -34,7 +34,7 @@ def convert_to_seconds(time_string):
 
 
 if __name__ == '__main__':
-    realized_intentions = load_annotations(pid=2, segment_length=2)
+    realized_intentions = load_annotations(pid=23, segment_length=2)
     time_list = realized_intentions[0]
     accel_ds_path = "../data/accel/subj_accel_interp.pkl"
     extractor = AccelExtractor(accel_ds_path)

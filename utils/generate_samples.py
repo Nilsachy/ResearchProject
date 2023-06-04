@@ -44,8 +44,6 @@ def generate_target_vector(segment_length, segment_start, start_time, end_time):
 
 
 if __name__ == '__main__':
-    valid_pids = [2, 3, 4, 5, 7, 10, 11, 17, 22, 23, 27, 34, 35]
-    person_22 = '3 min 50 sec'
-    person_ids = [2]
+    person_ids = [2, 3, 4, 5, 7, 10, 11, 17, 22, 23, 27, 34, 35]
     res = generate_samples(person_ids, 2)
     print(res)
