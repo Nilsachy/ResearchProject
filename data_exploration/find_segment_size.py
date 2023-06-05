@@ -1,4 +1,4 @@
-from data_loading.load_annotations import load_annotations
+from data_loading.load_annotations import load_realized_annotations
 
 
 def find_segment_info(pids, segment_length):
@@ -9,7 +9,7 @@ def find_segment_info(pids, segment_length):
     # loop over all person ids
     for pid in pids:
         # load the time list for that person id
-        time_list = load_annotations(pid, segment_length)
+        time_list = load_realized_annotations(pid, segment_length)
         for time in time_list:
             # find the current segment length and add to the total sum
             current_segment_length = (time[1] - time[0])

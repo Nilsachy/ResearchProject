@@ -1,6 +1,6 @@
 import numpy as np
 
-from Model.CNN import build_model
+from Model.RNN import build_model
 from utils.divide_dataset import divide_dataset
 from utils.generate_samples import generate_samples
 
