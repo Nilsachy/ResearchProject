@@ -2,8 +2,9 @@ import math
 
 import numpy as np
 
-from data_loading.load_annotations import load_annotations
+from data_loading.load_annotations import load_realized_annotations
 from utils.AccelExtractor import AccelExtractor
+from utils.generate_negative_intentions_intervals import generate_negative_intentions_intervals
 
 
 def generate_samples(pids, segment_length):
@@ -13,8 +14,10 @@ def generate_samples(pids, segment_length):
     # Loop over every person id
     for pid in pids:
         # Load the annotated data for realized intentions
-        time_list_of_realized_intentions = load_annotations(pid, segment_length)
-        for t in time_list_of_realized_intentions:
+        time_list_of_realized_intentions = load_realized_annotations(pid, segment_length)
+        time_list_of_negative_samples = generate_negative_intentions_intervals(pid, segment_length)
+        concatenated_list = time_list_of_realized_intentions + time_list_of_negative_samples
+        for t in concatenated_list:
             # Extract features (accelerometer readings) and label vector for pid
             current_sample = extract_features_and_label_vector(pid, t, segment_length, extractor)
             # Add the new samples to the list

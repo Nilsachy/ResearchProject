@@ -3,7 +3,7 @@ import numpy as np
 from utils.AccelExtractor import AccelExtractor
 
 
-def load_annotations(pid, segment_length):
+def load_realized_annotations(pid, segment_length):
     file_path = "../data/annotations/realized/Person" + str(pid) + "-realized-intentions.txt"
 
     time_list = []
@@ -34,7 +34,7 @@ def convert_to_seconds(time_string):
 
 
 if __name__ == '__main__':
-    realized_intentions = load_annotations(pid=23, segment_length=2)
+    realized_intentions = load_realized_annotations(pid=23, segment_length=2)
     time_list = realized_intentions[0]
     accel_ds_path = "../data/accel/subj_accel_interp.pkl"
     extractor = AccelExtractor(accel_ds_path)

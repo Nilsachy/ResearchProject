@@ -15,13 +15,35 @@ def make_predictions(pids, segment_length):
     threshold = 0.5
     # Convert predictions to binary values based on the threshold
     binary_predictions = np.where(predictions >= threshold, 1, 0)
-    evaluate_using_iou(binary_predictions, y_test)
+    # evaluate_using_iou(binary_predictions, y_test)
+    cla = evaluate_using_cla(binary_predictions, y_test)
+    print(cla)
+
+
+def evaluate_using_cla(predictions, y_test):
+    total_characters = 0
+    correct_characters = 0
+
+    for i in range(len(predictions)):
+        prediction = predictions[i]
+        true_label = y_test[i]
+
+        for j in range(len(prediction)):
+            total_characters += 1
+            if prediction[j] == true_label[j]:
+                correct_characters += 1
+
+    character_accuracy = correct_characters / total_characters
+
+    return character_accuracy
 
 
 def evaluate_using_iou(predictions, y_test):
     intersection = np.logical_and(predictions, y_test)
     union = np.logical_or(predictions, y_test)
-    iou_scores = np.sum(intersection, axis=1) / np.sum(union, axis=1)
+    union_sum = np.sum(union, axis=1)
+    union_sum[union_sum == 0] = 1
+    iou_scores = np.sum(intersection, axis=1) / union_sum
     average_iou = np.mean(iou_scores)
     print(average_iou)
 
