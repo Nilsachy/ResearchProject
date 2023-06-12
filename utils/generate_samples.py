@@ -36,7 +36,7 @@ def extract_features_and_label_vector(pid, t, segment_length, extractor):
 
 def generate_target_vector(segment_length, segment_start, start_time, end_time):
     # Fill in a numpy array with only zeros with size segment_length
-    segment_length_scaled = segment_length * 100
+    segment_length_scaled = segment_length * 20
     sampled_target = np.zeros(segment_length_scaled)  # Create an array of zeros with specified length
     # Find the ceiling start index of the intention to speak based on the segment info
     start_index = math.ceil((start_time - segment_start) / (end_time - segment_start) * segment_length_scaled)
