@@ -8,7 +8,8 @@ from utils.generate_negative_intentions_intervals import generate_negative_inten
 
 
 def generate_samples(pids, segment_length):
-    samples = []
+    X = []
+    y = []
     accel_ds_path = "../data/accel/subj_accel_interp.pkl"
     extractor = AccelExtractor(accel_ds_path)
     # Loop over every person id
@@ -19,10 +20,11 @@ def generate_samples(pids, segment_length):
         concatenated_list = time_list_of_realized_intentions + time_list_of_negative_samples
         for t in concatenated_list:
             # Extract features (accelerometer readings) and label vector for pid
-            current_sample = extract_features_and_label_vector(pid, t, segment_length, extractor)
+            current_accelerometer_data, current_label_vector = extract_features_and_label_vector(pid, t, segment_length, extractor)
             # Add the new samples to the list
-            samples.append(current_sample)
-    return samples
+            X.append(current_accelerometer_data)
+            y.append(current_label_vector)
+    return np.array(X), np.array(y)
 
 
 def extract_features_and_label_vector(pid, t, segment_length, extractor):
