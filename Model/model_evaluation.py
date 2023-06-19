@@ -31,16 +31,17 @@ def make_predictions(pids, segment_length):
 
         auc_scores_realized.append(test_realized(X_test_realized, y_test_realized, model))
         auc_scores_unrealized.append(test_unrealized(X_test_unrealized, y_test_unrealized, model))
-        # auc_scores_combination.append(test_combination(X_test_realized, y_test_realized, X_test_unrealized, y_test_unrealized, model))
+        auc_scores_combination.append(test_combination(X_test_realized, y_test_realized, X_test_unrealized, y_test_unrealized, model))
 
     # Calculate the average AUC ROC score across all folds
     avg_auc_score_realized = sum(auc_scores_realized) / len(auc_scores_realized)
     avg_auc_score_unrealized = sum(auc_scores_unrealized) / len(auc_scores_unrealized)
-    # avg_auc_score_combination = sum(auc_scores_combination) / len(auc_scores_combination)
+    avg_auc_score_combination = sum(auc_scores_combination) / len(auc_scores_combination)
     # Print the average AUC ROC score
     print("Average AUC ROC score realized intentions:", avg_auc_score_realized)
     print("Average AUC ROC score unrealized intentions:", avg_auc_score_unrealized)
-    # print("Average AUC ROC score combination:", avg_auc_score_combination)
+    print("Average AUC ROC score combination:", avg_auc_score_combination)
+    plot_auc_scores(auc_scores_realized, auc_scores_unrealized, auc_scores_combination)
 
 
 def test_realized(X_test_realized, y_test_realized, model):
@@ -54,8 +55,8 @@ def test_unrealized(X_test_unrealized, y_test_unrealized, model):
 
 
 def test_combination(X_test_realized, y_test_realized, X_test_unrealized, y_test_unrealized, model):
-    X_test_combination = np.concatenate((X_test_realized, X_test_unrealized), axis=1)
-    y_test_combination = np.concatenate((y_test_realized, y_test_unrealized), axis=1)
+    X_test_combination = np.concatenate((X_test_realized, X_test_unrealized), axis=0)
+    y_test_combination = np.concatenate((y_test_realized, y_test_unrealized), axis=0)
     y_pred_proba_combination = model.predict(X_test_combination)
     return calculate_auc_score(y_pred_proba_combination, y_test_combination)
 
@@ -68,24 +69,17 @@ def calculate_auc_score(y_pred_proba, y_test):
     return auc_score
 
 
-def plot_auc_scores(auc_scores):
-    # Sample data for the lines
-    x = [i for i in range(1, 6)]
-    print(x)
-
-    # Plotting the lines
-    plt.plot(x, auc_scores, color='blue', label='AUC-ROC')
-
-    # Adding a legend
-    plt.legend()
-
-    # Adding labels and title
-    plt.xlabel('Fold')
-    plt.ylabel('AUC-ROC score')
-    plt.title('Plot of AUC-ROC score on 5-fold cross validation')
-    plt.xticks([1, 2, 3, 4, 5])
-    plt.yticks([0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 1.00])
-
+def plot_auc_scores(auc_scores_realized, auc_scores_unrealized, auc_scores_combination):
+    # Combine the arrays into a single list
+    data = [auc_scores_realized, auc_scores_unrealized, auc_scores_combination]
+    # Create a figure and axis
+    fig, ax = plt.subplots()
+    # Plot the box and whisker plot
+    ax.boxplot(data)
+    # Add labels to the x-axis
+    ax.set_xticklabels(['Realized', 'Unrealized', 'Combination'])
+    # Add a title to the plot
+    ax.set_title('Box and Whisker Plot')
     # Display the plot
     plt.show()
 
