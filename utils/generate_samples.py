@@ -2,6 +2,7 @@ import math
 
 import numpy as np
 
+from data_exploration.find_non_and_overlapping_segments import find_non_overlapping_segments_for_pid
 from data_loading.load_annotations import load_realized_annotations, load_unrealized_annotations
 from utils.AccelExtractor import AccelExtractor
 from utils.generate_negative_intentions_intervals import generate_negative_intentions_intervals
@@ -35,13 +36,14 @@ def generate_unrealized_samples(pids, segment_length):
     # Loop over every person id
     for pid in pids:
         # Load the annotated data for realized intentions
-        time_list_of_unrealized_intentions = load_unrealized_annotations(pid, segment_length)
+        time_list_of_unrealized_intentions = find_non_overlapping_segments_for_pid(pid, segment_length)
         for t in time_list_of_unrealized_intentions:
             # Extract features (accelerometer readings) and label vector for pid
             current_accelerometer_data, current_label_vector = extract_features_and_label_vector(pid, t, segment_length, extractor)
             # Add the new samples to the list
             X.append(current_accelerometer_data)
             y.append(current_label_vector)
+    print('Num of unrealized intentions: ', len(X))
     return np.array(X), np.array(y)
 
 

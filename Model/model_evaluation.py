@@ -79,7 +79,7 @@ def plot_auc_scores(auc_scores_realized, auc_scores_unrealized, auc_scores_combi
     # Add labels to the x-axis
     ax.set_xticklabels(['Realized', 'Unrealized', 'Combination'])
     # Add a title to the plot
-    ax.set_title('Box and Whisker Plot')
+    ax.set_title('AUC scores (Box plot)')
     # Display the plot
     plt.show()
 

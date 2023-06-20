@@ -65,4 +65,8 @@ def print_accelerometer_data_for_pid(pid, segment_length):
 
 
 if __name__ == '__main__':
-    print(load_unrealized_annotations(10, 2))
+    pids = [2, 3, 4, 5, 7, 10, 11, 17, 22, 23, 27, 34, 35]
+    count = 0
+    for pid in pids:
+        count += len(load_unrealized_annotations(pid, 2))
+    print(count)
