@@ -15,9 +15,16 @@ def make_predictions(pids, segment_length):
     # Create a KFold object
     kf = KFold(n_splits=k_folds, shuffle=True)
     # Perform K-fold cross-validation
+
     auc_scores_realized = []
+    auc_scores_realized_dummy = []
+
     auc_scores_unrealized = []
+    auc_scores_unrealized_dummy = []
+
     auc_scores_combination = []
+    auc_scores_combination_dummy = []
+
     for train_index, test_index in kf.split(X):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test_realized = y[train_index], y[test_index]
@@ -29,36 +36,77 @@ def make_predictions(pids, segment_length):
         print(X_test_unrealized_bef_reshape)
         X_test_unrealized = np.reshape(X_test_unrealized_bef_reshape, (X_test_unrealized_bef_reshape.shape[0], 40, 3))
 
-        auc_scores_realized.append(test_realized(X_test_realized, y_test_realized, model))
-        auc_scores_unrealized.append(test_unrealized(X_test_unrealized, y_test_unrealized, model))
-        auc_scores_combination.append(test_combination(X_test_realized, y_test_realized, X_test_unrealized, y_test_unrealized, model))
+        auc_score_realized, auc_score_realized_dummy = test_realized(X_test_realized, y_test_realized, model)
+        auc_score_unrealized, auc_score_unrealized_dummy = test_unrealized(X_test_unrealized, y_test_unrealized, model)
+        auc_score_combination, auc_score_combination_dummy = test_combination(X_test_realized, y_test_realized, X_test_unrealized, y_test_unrealized, model)
+
+        auc_scores_realized.append(auc_score_realized)
+        auc_scores_realized_dummy.append(auc_score_realized_dummy)
+
+        auc_scores_unrealized.append(auc_score_unrealized)
+        auc_scores_unrealized_dummy.append(auc_score_unrealized_dummy)
+
+        auc_scores_combination.append(auc_score_combination)
+        auc_scores_combination_dummy.append(auc_score_combination_dummy)
 
     # Calculate the average AUC ROC score across all folds
     avg_auc_score_realized = sum(auc_scores_realized) / len(auc_scores_realized)
     avg_auc_score_unrealized = sum(auc_scores_unrealized) / len(auc_scores_unrealized)
     avg_auc_score_combination = sum(auc_scores_combination) / len(auc_scores_combination)
+    avg_auc_score_dummy_realized = sum(auc_scores_realized_dummy) / len(auc_scores_realized_dummy)
+    avg_auc_score_dummy_unrealized = sum(auc_scores_unrealized_dummy) / len(auc_scores_unrealized_dummy)
+    avg_auc_score_dummy_combination = sum(auc_scores_combination_dummy) / len(auc_scores_combination_dummy)
     # Print the average AUC ROC score
     print("Average AUC ROC score realized intentions:", avg_auc_score_realized)
     print("Average AUC ROC score unrealized intentions:", avg_auc_score_unrealized)
     print("Average AUC ROC score combination:", avg_auc_score_combination)
-    plot_auc_scores(auc_scores_realized, auc_scores_unrealized, auc_scores_combination)
+    print("Average AUC ROC score realized dummy intentions:", avg_auc_score_dummy_realized)
+    print("Average AUC ROC score unrealized dummy intentions:", avg_auc_score_dummy_unrealized)
+    print("Average AUC ROC score dummy combination:", avg_auc_score_dummy_combination)
+    print('AUC scores for realized: ', auc_scores_realized, 'AUC scores for dummy realized: ', auc_scores_realized_dummy)
+    print('AUC scores for unrealized: ', auc_scores_unrealized, 'AUC scores for dummy unrealized: ', auc_scores_unrealized_dummy)
+    print('AUC scores for combination: ', auc_scores_combination, 'AUC scores for dummy combination: ', auc_scores_combination_dummy)
+    plot_auc_scores(auc_scores_realized, auc_scores_realized_dummy, 'Realized')
+    plot_auc_scores(auc_scores_unrealized, auc_scores_unrealized_dummy, 'Unrealized')
+    plot_auc_scores(auc_scores_combination, auc_scores_combination_dummy, 'Combination')
 
 
 def test_realized(X_test_realized, y_test_realized, model):
     y_pred_proba_realized = model.predict(X_test_realized)
-    return calculate_auc_score(y_pred_proba_realized, y_test_realized)
+    auc_score = calculate_auc_score(y_pred_proba_realized, y_test_realized)
+    auc_score_dummy = calculate_auc_score_dummy_model(y_pred_proba_realized, y_test_realized)
+    return auc_score, auc_score_dummy
 
 
 def test_unrealized(X_test_unrealized, y_test_unrealized, model):
     y_pred_proba_unrealized = model.predict(X_test_unrealized)
-    return calculate_auc_score(y_pred_proba_unrealized, y_test_unrealized)
+    auc_score = calculate_auc_score(y_pred_proba_unrealized, y_test_unrealized)
+    auc_score_dummy = calculate_auc_score_dummy_model(y_pred_proba_unrealized, y_test_unrealized)
+    return auc_score, auc_score_dummy
 
 
 def test_combination(X_test_realized, y_test_realized, X_test_unrealized, y_test_unrealized, model):
     X_test_combination = np.concatenate((X_test_realized, X_test_unrealized), axis=0)
     y_test_combination = np.concatenate((y_test_realized, y_test_unrealized), axis=0)
     y_pred_proba_combination = model.predict(X_test_combination)
-    return calculate_auc_score(y_pred_proba_combination, y_test_combination)
+    auc_score = calculate_auc_score(y_pred_proba_combination, y_test_combination)
+    auc_score_dummy = calculate_auc_score_dummy_model(y_pred_proba_combination, y_test_combination)
+    return auc_score, auc_score_dummy
+
+
+def calculate_auc_score_dummy_model(y_pred, y_test):
+    # Get the shape of the original matrix
+    rows, columns = y_test.shape
+    # Create the new matrix of the same size with arrays of size 40
+    dummy_y_test = []
+    # Populate the new matrix with arrays containing zeros and ones
+    for i in range(rows):
+        arr = np.zeros(40)
+        middle = 40 // 2
+        arr[middle:] = 1
+        dummy_y_test.append(arr)
+    dummy_y_test = np.array(dummy_y_test)
+    return calculate_auc_score(dummy_y_test, y_test)
 
 
 def calculate_auc_score(y_pred_proba, y_test):
@@ -69,17 +117,18 @@ def calculate_auc_score(y_pred_proba, y_test):
     return auc_score
 
 
-def plot_auc_scores(auc_scores_realized, auc_scores_unrealized, auc_scores_combination):
+def plot_auc_scores(auc_scores, auc_scores_dummy, configuration):
     # Combine the arrays into a single list
-    data = [auc_scores_realized, auc_scores_unrealized, auc_scores_combination]
+    data = [auc_scores, auc_scores_dummy]
     # Create a figure and axis
     fig, ax = plt.subplots()
     # Plot the box and whisker plot
     ax.boxplot(data)
     # Add labels to the x-axis
-    ax.set_xticklabels(['Realized', 'Unrealized', 'Combination'])
+    ax.set_xticklabels([configuration, 'Baseline'])
     # Add a title to the plot
     ax.set_title('AUC scores (Box plot)')
+    plt.savefig('../results/' + configuration + '-results.png')
     # Display the plot
     plt.show()
 
