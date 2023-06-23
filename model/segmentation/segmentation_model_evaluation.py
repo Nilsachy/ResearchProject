@@ -1,10 +1,9 @@
 import numpy as np
-from sklearn.metrics import roc_auc_score, average_precision_score
+from sklearn.metrics import roc_auc_score
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
 
-from Model.RNN import build_model
-from utils.divide_dataset import divide_dataset
+from model.segmentation.RNN_segmentation import build_model
 from utils.generate_samples import generate_samples, generate_unrealized_samples
 
 
@@ -125,9 +124,9 @@ def plot_auc_scores(auc_scores, auc_scores_dummy, configuration):
     # Plot the box and whisker plot
     ax.boxplot(data)
     # Add labels to the x-axis
-    ax.set_xticklabels([configuration, 'Baseline'])
+    ax.set_xticklabels(['Trained model', 'Baseline model'])
     # Add a title to the plot
-    ax.set_title('AUC scores (Box plot)')
+    ax.set_title('AUC scores (Box plot) - ' + configuration)
     plt.savefig('../results/' + configuration + '-results.png')
     # Display the plot
     plt.show()
