@@ -3,7 +3,7 @@ from sklearn.metrics import roc_auc_score, average_precision_score
 import matplotlib.pyplot as plt
 from sklearn.model_selection import KFold
 
-from Model.RNN import build_model
+from model.RNN import build_model
 from utils.divide_dataset import divide_dataset
 from utils.generate_samples import generate_samples, generate_unrealized_samples
 
