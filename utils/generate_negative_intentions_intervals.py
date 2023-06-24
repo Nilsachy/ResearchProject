@@ -18,9 +18,7 @@ def generate_non_overlapping_times(current_times, segment_length, start_range, e
     return start_time, start_of_intention, end_time
 
 
-def generate_negative_intentions_intervals(pid, segment_length):
-    current_times = load_realized_annotations(pid, segment_length)
-
+def generate_negative_intentions_intervals(current_times, segment_length):
     start_range = current_times[0][0]
     end_range = current_times[-1][2]
 
@@ -33,4 +31,5 @@ def generate_negative_intentions_intervals(pid, segment_length):
 
 
 if __name__ == '__main__':
-    generate_negative_intentions_intervals(23, 2)
+    current_times = load_realized_annotations(23, 2)
+    generate_negative_intentions_intervals(current_times, 2)
