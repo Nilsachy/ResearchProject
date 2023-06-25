@@ -17,7 +17,9 @@ def generate_samples(pids, segment_length):
     for pid in pids:
         # Load the annotated data for realized intentions
         time_list_of_realized_intentions = load_realized_annotations(pid, segment_length)
-        time_list_of_negative_samples = generate_negative_intentions_intervals(time_list_of_realized_intentions, segment_length)
+        time_list_of_unrealized_intentions = load_unrealized_annotations(pid, segment_length)
+        time_list = time_list_of_realized_intentions + time_list_of_unrealized_intentions
+        time_list_of_negative_samples = generate_negative_intentions_intervals(time_list, segment_length)
         concatenated_list = time_list_of_realized_intentions + time_list_of_negative_samples
         for t in concatenated_list:
             # Extract features (accelerometer readings) and label vector for pid

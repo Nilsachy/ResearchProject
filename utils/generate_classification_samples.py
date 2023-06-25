@@ -1,4 +1,3 @@
-import math
 
 import numpy as np
 
@@ -9,7 +8,8 @@ from utils.generate_negative_intentions_intervals import generate_negative_inten
 
 
 def generate_classification_samples(pids, segment_length):
-    X = []
+    X_windows = []
+    X_segments = []
     y = []
     accel_ds_path = "../data/accel/subj_accel_interp.pkl"
     extractor = AccelExtractor(accel_ds_path)
@@ -17,20 +17,28 @@ def generate_classification_samples(pids, segment_length):
     for pid in pids:
         # Load the annotated data for realized intentions
         time_list_of_realized_intentions = load_realized_annotations(pid, segment_length)
-        time_list_of_negative_samples = generate_negative_intentions_intervals(time_list_of_realized_intentions, segment_length)
+        time_list_of_unrealized_intentions = load_unrealized_annotations(pid, segment_length)
+        time_list = time_list_of_realized_intentions + time_list_of_unrealized_intentions
+        time_list_of_negative_samples = generate_negative_intentions_intervals(time_list, segment_length)
         concatenated_list = time_list_of_realized_intentions + time_list_of_negative_samples
         for t in concatenated_list:
             # Extract features (accelerometer readings) and label vector for pid
-            current_accelerometer_data = extractor.__call__(pid, t[0], t[2])
+            current_accelerometer_data_window = extractor.__call__(pid, t[0], t[2])
+            current_accelerometer_data_segment = extractor.__call__(pid, t[1], t[2])
             current_label = extract_label(t)
             # Add the new samples to the list
-            X.append(current_accelerometer_data)
+            X_windows.append(current_accelerometer_data_window)
+            X_segments.append(current_accelerometer_data_segment)
             y.append(current_label)
-    return np.array(X), np.array(y)
+        # Find the maximum row size across all sub-matrices
+    max_row_size = max(len(row) for sub_matrix in X_segments for row in sub_matrix)
+    X_segments = pad_matrix(X_segments, max_row_size)
+    return np.array(X_windows), np.array(X_segments), np.array(y)
 
 
-def generate_unrealized_classification_samples(pids, segment_length):
-    X = []
+def generate_unrealized_classification_samples(pids, segment_length, max_row_size):
+    X_windows = []
+    X_segments = []
     y = []
     accel_ds_path = "../data/accel/subj_accel_interp.pkl"
     extractor = AccelExtractor(accel_ds_path)
@@ -40,13 +48,25 @@ def generate_unrealized_classification_samples(pids, segment_length):
         time_list_of_unrealized_intentions = find_non_overlapping_segments_for_pid(pid, segment_length)
         for t in time_list_of_unrealized_intentions:
             # Extract features (accelerometer readings) and label vector for pid
-            current_accelerometer_data = extractor.__call__(pid, t[0], t[2])
+            current_accelerometer_data_window = extractor.__call__(pid, t[0], t[2])
+            current_accelerometer_data_segment = extractor.__call__(pid, t[1], t[2])
             current_label = extract_label(t)
-            # Add the new samples to the list
-            X.append(current_accelerometer_data)
+            X_windows.append(current_accelerometer_data_window)
+            X_segments.append(current_accelerometer_data_segment)
             y.append(current_label)
-    print('Num of unrealized intentions: ', len(X))
-    return np.array(X), np.array(y)
+    X_segments = pad_matrix(X_segments, max_row_size)
+    return np.array(X_windows), np.array(X_segments), np.array(y)
+
+
+def pad_matrix(matrix, max_row_size):
+    # Pad each row across the sub-matrices to the front with zeros
+    padded_matrix = np.zeros((len(matrix), len(matrix[0]), max_row_size))
+
+    for i, sub_matrix in enumerate(matrix):
+        for j, row in enumerate(sub_matrix):
+            padded_row = np.pad(row, (max_row_size - len(row), 0), 'constant')
+            padded_matrix[i, j, :] = padded_row
+    return padded_matrix
 
 
 def extract_label(t):
