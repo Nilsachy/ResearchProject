@@ -21,8 +21,12 @@ def make_predictions(pids, segment_length):
                                             (X_test_unrealized_bef_reshape_window_3.shape[0], 60, 3))
     X_test_unrealized_window_4s = np.reshape(X_test_unrealized_bef_reshape_window_4,
                                             (X_test_unrealized_bef_reshape_window_4.shape[0], 80, 3))
-    X_test_unrealized_segment = np.reshape(X_test_unrealized_bef_reshape_segment, (X_test_unrealized_bef_reshape_segment.shape[0], X_test_unrealized_bef_reshape_segment.shape[2], 3))
+    X_test_unrealized_segment = np.reshape(X_test_unrealized_bef_reshape_segment,
+                                           (X_test_unrealized_bef_reshape_segment.shape[0],
+                                            X_test_unrealized_bef_reshape_segment.shape[2], 3))
 
+    auc_scores_realized_segments, auc_scores_unrealized_segments, auc_scores_combination_segments = train_and_test(
+        X_segments, y, X_test_unrealized_segment, y_test_unrealized)
     auc_scores_realized_window_1s, auc_scores_unrealized_window_1s, auc_scores_combination_window_1s = train_and_test(
         X_window_1s, y, X_test_unrealized_window_1s, y_test_unrealized)
     auc_scores_realized_window_2s, auc_scores_unrealized_window_2s, auc_scores_combination_window_2s = train_and_test(
@@ -32,7 +36,6 @@ def make_predictions(pids, segment_length):
     auc_scores_realized_window_4s, auc_scores_unrealized_window_4s, auc_scores_combination_window_4s = train_and_test(
         X_window_4s, y, X_test_unrealized_window_4s, y_test_unrealized)
 
-    auc_scores_realized_segments, auc_scores_unrealized_segments, auc_scores_combination_segments = train_and_test(X_segments, y, X_test_unrealized_segment, y_test_unrealized)
     # Calculate the average AUC ROC score across all folds
     avg_auc_score_realized_window_1s = sum(auc_scores_realized_window_1s) / len(auc_scores_realized_window_1s)
     avg_auc_score_realized_window_2s = sum(auc_scores_realized_window_2s) / len(auc_scores_realized_window_2s)
@@ -45,9 +48,9 @@ def make_predictions(pids, segment_length):
     # avg_auc_score_unrealized_segments = sum(auc_scores_unrealized_segments) / len(auc_scores_unrealized_segments)
     # avg_auc_score_combination_segments = sum(auc_scores_combination_segments) / len(auc_scores_combination_segments)
     print('AUC window_1s', auc_scores_realized_window_1s)
-    print('AUC window_2s', auc_scores_realized_window_1s)
-    print('AUC window_3s', auc_scores_realized_window_1s)
-    print('AUC window_4s', auc_scores_realized_window_1s)
+    print('AUC window_2s', auc_scores_realized_window_2s)
+    print('AUC window_3s', auc_scores_realized_window_3s)
+    print('AUC window_4s', auc_scores_realized_window_4s)
     print('AUC segments', auc_scores_realized_segments)
     # Print the average AUC ROC score
     print('Average AUC ROC score realized intentions (Window 1s):', avg_auc_score_realized_window_1s)
@@ -127,10 +130,10 @@ def plot_auc_scores(auc_scores_window_1s, auc_scores_window_2s, auc_scores_windo
     # Plot the box and whisker plot
     ax.boxplot(data)
     # Add labels to the x-axis
-    ax.set_xticklabels(['1 s', '2 s.', '3 s', '4 s', 'supervised'])
+    ax.set_xticklabels(['1 s', '2 s', '3 s', '4 s', 'supervised'])
     # Add a title to the plot
     ax.set_title('AUC scores for classification (Box plot)')
-    plt.savefig('../results/realized-classification-results-4.png')
+    plt.savefig('../results/realized-classification-results-5.png')
     # Display the plot
     plt.show()
 
