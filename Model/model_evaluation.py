@@ -1,3 +1,5 @@
+from statistics import stdev
+
 import numpy as np
 from sklearn.metrics import roc_auc_score, average_precision_score
 import matplotlib.pyplot as plt
@@ -56,6 +58,24 @@ def make_predictions(pids, segment_length):
     avg_auc_score_dummy_realized = sum(auc_scores_realized_dummy) / len(auc_scores_realized_dummy)
     avg_auc_score_dummy_unrealized = sum(auc_scores_unrealized_dummy) / len(auc_scores_unrealized_dummy)
     avg_auc_score_dummy_combination = sum(auc_scores_combination_dummy) / len(auc_scores_combination_dummy)
+
+    std_auc_scores_realized = stdev(auc_scores_realized)
+    std_auc_scores_unrealized = stdev(auc_scores_unrealized)
+    std_auc_scores_combination = stdev(auc_scores_combination)
+
+    std_auc_scores_realized_dummy = stdev(auc_scores_realized_dummy)
+    std_auc_scores_unrealized_dummy = stdev(auc_scores_unrealized_dummy)
+    std_auc_scores_combination_dummy = stdev(auc_scores_combination_dummy)
+
+    print('Trained model')
+    print(std_auc_scores_realized)
+    print(std_auc_scores_unrealized)
+    print(std_auc_scores_combination)
+    print('Baseline model')
+    print(std_auc_scores_realized_dummy)
+    print(std_auc_scores_unrealized_dummy)
+    print(std_auc_scores_combination_dummy)
+
     # Print the average AUC ROC score
     print("Average AUC ROC score realized intentions:", avg_auc_score_realized)
     print("Average AUC ROC score unrealized intentions:", avg_auc_score_unrealized)

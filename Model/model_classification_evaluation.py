@@ -1,3 +1,5 @@
+from statistics import stdev
+
 import numpy as np
 from keras.utils import pad_sequences
 from sklearn.metrics import roc_auc_score, average_precision_score
@@ -56,11 +58,43 @@ def make_predictions(pids, segment_length):
     avg_auc_score_unrealized_segments = sum(auc_scores_unrealized_segments) / len(auc_scores_unrealized_segments)
     avg_auc_score_combination_segments = sum(auc_scores_combination_segments) / len(auc_scores_combination_segments)
 
-    print('AUC window_1s (realized/unrealized/combination)', auc_scores_realized_window_1s, auc_scores_unrealized_window_1s, auc_scores_combination_window_1s)
-    print('AUC window_2s (realized/unrealized/combination)', auc_scores_realized_window_2s, auc_scores_unrealized_window_2s, auc_scores_combination_window_2s)
-    print('AUC window_3s (realized/unrealized/combination)', auc_scores_realized_window_3s, auc_scores_unrealized_window_3s, auc_scores_combination_window_3s)
-    print('AUC window_4s (realized/unrealized/combination)', auc_scores_realized_window_4s, auc_scores_unrealized_window_4s, auc_scores_combination_window_4s)
-    print('AUC segments (realized/unrealized/combination)', auc_scores_realized_segments, auc_scores_unrealized_segments, auc_scores_combination_segments)
+    print('Realized:')
+    print(avg_auc_score_realized_window_1s)
+    print(avg_auc_score_realized_window_2s)
+    print(avg_auc_score_realized_window_3s)
+    print(avg_auc_score_realized_window_4s)
+    print(avg_auc_score_realized_segments)
+    print('Unrealized:')
+    print(avg_auc_score_unrealized_window_1s)
+    print(avg_auc_score_unrealized_window_2s)
+    print(avg_auc_score_unrealized_window_3s)
+    print(avg_auc_score_unrealized_window_4s)
+    print(avg_auc_score_unrealized_segments)
+    print('Unrealized:')
+    print(avg_auc_score_combination_window_1s)
+    print(avg_auc_score_combination_window_2s)
+    print(avg_auc_score_combination_window_3s)
+    print(avg_auc_score_combination_window_4s)
+    print(avg_auc_score_combination_segments)
+
+    # Calculate the standard deviations
+    std_dev_window_1s = stdev(auc_scores_realized_window_1s), stdev(auc_scores_unrealized_window_1s), stdev(
+        auc_scores_combination_window_1s)
+    std_dev_window_2s = stdev(auc_scores_realized_window_2s), stdev(auc_scores_unrealized_window_2s), stdev(
+        auc_scores_combination_window_2s)
+    std_dev_window_3s = stdev(auc_scores_realized_window_3s), stdev(auc_scores_unrealized_window_3s), stdev(
+        auc_scores_combination_window_3s)
+    std_dev_window_4s = stdev(auc_scores_realized_window_4s), stdev(auc_scores_unrealized_window_4s), stdev(
+        auc_scores_combination_window_4s)
+    std_dev_segments = stdev(auc_scores_realized_segments), stdev(auc_scores_unrealized_segments), stdev(
+        auc_scores_combination_segments)
+
+    # Print the standard deviations
+    print('Standard Deviation AUC window_1s (realized/unrealized/combination):', std_dev_window_1s)
+    print('Standard Deviation AUC window_2s (realized/unrealized/combination):', std_dev_window_2s)
+    print('Standard Deviation AUC window_3s (realized/unrealized/combination):', std_dev_window_3s)
+    print('Standard Deviation AUC window_4s (realized/unrealized/combination):', std_dev_window_4s)
+    print('Standard Deviation AUC segments (realized/unrealized/combination):', std_dev_segments)
 
     plot_auc_scores(auc_scores_realized_window_1s, auc_scores_realized_window_2s, auc_scores_realized_window_3s,
                     auc_scores_realized_window_4s, auc_scores_realized_segments, configuration='Realized')
@@ -138,7 +172,7 @@ def plot_auc_scores(auc_scores_window_1s, auc_scores_window_2s, auc_scores_windo
     ax.set_xticklabels(['1 s', '2 s', '3 s', '4 s', 'supervised'])
     # Add a title to the plot
     ax.set_title('AUC scores for classification (Box plot) - ' + configuration)
-    plt.savefig('../results/' + configuration + '-classification-results-5.png')
+    plt.savefig('../results/' + configuration + '-classification-results.png')
     # Display the plot
     plt.show()
 
